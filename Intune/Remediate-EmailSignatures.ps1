@@ -57,7 +57,7 @@ If (Test-Path "$temp\$githubProductOrg-$githubProductRepo-$($($productMeta.commi
     Invoke-WebRequest "$($productMeta.zipball_url)" -Out $productZip
 }
 If (Test-Path "$temp\$githubTemplateOrg-$githubTemplateRepo-$($($templateMeta.commit.sha).substring(0,7))" ){
-    Write-Host .. no need to download the product, a local copy already exists
+    Write-Host .. no need to download the templates, a local copy already exists
 } else {
     # Initiate the download
     Invoke-WebRequest "$($templateMeta.zipball_url)" -Out $templateZip
