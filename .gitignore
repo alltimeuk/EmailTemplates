@@ -1,0 +1,4 @@
+#Any locally downloaded examples to be removed.
+*.zip
+test
+test\*

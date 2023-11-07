@@ -29,16 +29,16 @@ $file = "$temp\Set-OutlookSignatures.log"
 
 # Check if the log file exists
 If (Test-Path $file ){
-    Write-Host "Log file found, executed... checking further"
+    Write-Host "Email Signatures LOG found."
     If ( $(Get-Date).AddHours(-2) -gt $(Get-Item $file).LastWriteTime  ) {
-        Write-Host "Log file found, written to recently, skipping"
+        Write-Host "Log file written to within the last 2 hours. Exiting."
         exit 0
     } Else {
-        Write-Host "Log file found, but not written to in a while"
+        Write-Host "Log is old. Remediation Required."
         exit 1
     }
 }
 Else {
-    Write-Host "Log file NOT found, never executed"
+    Write-Host "Email Signatures LOG not found. Remediation Required."
     exit 1
 }

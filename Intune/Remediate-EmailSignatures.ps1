@@ -39,49 +39,66 @@ $MirrorLocalSignaturesToCloud = "true"
 
 # Init
 #New-Item -Name "temp" -path $env:localappdata -ItemType Directory -ErrorAction SilentlyContinue
-$temp = "$($env:localappdata)\temp"
+$temp = gl
 
 # Obtain the latest release off each github project  -- note: latest is always array item 0
-$productMeta = (Invoke-WebRequest "https://api.github.com/repos/$githubProductOrg/$githubProductRepo/tags" | ConvertFrom-Json)[0]
-$templateMeta = (Invoke-WebRequest "https://api.github.com/repos/$githubTemplateOrg/$githubTemplateRepo/tags" | ConvertFrom-Json)[0]
+$productUrl = "https://api.github.com/repos/$githubProductOrg/$githubProductRepo/tags"
+$templateUrl = "https://api.github.com/repos/$githubTemplateOrg/$githubTemplateRepo/tags"
+$productMeta = (Invoke-WebRequest $productUrl | ConvertFrom-Json)[0]
+$templateMeta = (Invoke-WebRequest $templateUrl | ConvertFrom-Json)[0]
 
 # Specify the file-system of the downloaded targets
-$productZip = "$temp/Set-OutlookSignatures.zip"
-$templateZip = "$temp/EmailTemplates.zip"
+$productZip = "$temp\Set-OutlookSignatures.zip"
+$templateZip = "$temp\EmailTemplates.zip"
+$productPath = "$temp\$githubProductOrg-$githubProductRepo-$($($productMeta.commit.sha).substring(0,7))"
+$templatePath = "$temp\$githubTemplateOrg-$githubTemplateRepo-$($($templateMeta.commit.sha).substring(0,7))" 
 
-# Check if the latest version is already downloaded
-If (Test-Path "$temp\$githubProductOrg-$githubProductRepo-$($($productMeta.commit.sha).substring(0,7))" ){
-    Write-Host .. no need to download the product, a local copy already exists
+Add-Type -AssemblyName System.IO.Compression.FileSystem
+
+# Check if the latest version is already downloaded, clean up the file-system and download+extract, or just extract again
+If (Test-Path $productPath){
+    Write-Host "Cleaning up local path $productPath"
+    Remove-Item $productPath -recurse -Force
 } else {
-    # Initiate the download
+    Write-Host "Downloading $productUrl to $productZip"
     Invoke-WebRequest "$($productMeta.zipball_url)" -Out $productZip
 }
-If (Test-Path "$temp\$githubTemplateOrg-$githubTemplateRepo-$($($templateMeta.commit.sha).substring(0,7))" ){
-    Write-Host .. no need to download the templates, a local copy already exists
+
+If (Test-Path $templatePath){
+    Write-Host "Cleaning up local path $templatePath"
+    Remove-Item $templatePath -recurse -Force
 } else {
-    # Initiate the download
+    Write-Host "Downloading $templateUrl to $templateZip"
     Invoke-WebRequest "$($templateMeta.zipball_url)" -Out $templateZip
 }
+Write-host "==============="
+dir .
+Write-host "==============="
 
-# Extract the zipball files to the temp directory, filename encoding needs converting to ascii, not utf8.
-Add-Type -AssemblyName System.IO.Compression.FileSystem
-[System.IO.Compression.ZipFile]::ExtractToDirectory($productZip, $temp, [System.Text.Encoding]::ascii)
-[System.IO.Compression.ZipFile]::ExtractToDirectory($templateZip, $temp, [System.Text.Encoding]::ascii)
 
-# Extract zip files to the temp directory
-#Expand-Archive -Path $productZip -DestinationPath $temp -Force -ErrorAction SilentlyContinue
-#Expand-Archive -Path $templateZip -DestinationPath $temp -Force -ErrorAction SilentlyContinue
+# A fresh Extraction of the zipball files to the temp directory, filename encoding needs converting to ascii, not utf8.
+# Note: some errors with file-name length when testing with my user docs area. C:\WINDOWS\IMECache\HealthScripts\(GUID)\ is just as long, so skip errors. Only signature samples anyway, don't need them.
+Write-Host "Extracting $productZip to $temp"
+[System.IO.Compression.ZipFile]::ExtractToDirectory("$productZip", "$temp", [System.Text.Encoding]::ascii) | out-null
+Write-Host "Extracting $templateZip to $temp"
+[System.IO.Compression.ZipFile]::ExtractToDirectory("$templateZip", "$temp", [System.Text.Encoding]::ascii) | out-null
+
+Write-host "==============="
+dir .
+Write-host "==============="
 
 # Gather some path data
-$productPath = "$temp\$githubProductOrg-$githubProductRepo-$($($productMeta.commit.sha).substring(0,7))\src_Set-OutlookSignatures"
-$templatePath = "$temp\$githubTemplateOrg-$githubTemplateRepo-$($($templateMeta.commit.sha).substring(0,7))"
-
+$productTargetPath = "$temp\$githubProductOrg-$githubProductRepo-$($($productMeta.commit.sha).substring(0,7))\src_Set-OutlookSignatures"
+$templateTargetPath = "$temp\$githubTemplateOrg-$githubTemplateRepo-$($($templateMeta.commit.sha).substring(0,7))"
+$executionPath = "$githubProductOrg-$githubProductRepo-$($($productMeta.commit.sha).substring(0,7))\src_Set-OutlookSignatures"
 # Clean up the downloaded content
-Remove-Item -Path $productZip -Force
-Remove-Item -Path $templateZip -Force
+#Remove-Item -Path $productZip -Force
+#Remove-Item -Path $templateZip -Force
 
 
 #Run product, with transcript logging, and args passed from variables above
 Start-Transcript $temp\Set-OutlookSignatures.log -Append
-powershell -executionpolicy bypass -windowstyle hidden -ScriptBlock { powershell $productPath\Set-OutlookSignatures.ps1 -graphonly $graphOnly -SignatureTemplatePath $templatePath\Signatures -SignatureIniPath $templatePath\Signatures\_Signatures.ini -SetCurrentUserOOFMessage $SetOofMsg -CreateRtfSignatures $CreateRtfSignatures -CreateTxtSignatures $CreateTxtSignatures -DisableRoamingSignatures $DisableRoamingSignatures -MirrorLocalSignaturesToCloud $MirrorLocalSignaturesToCloud }
+cd .\$executionPath
+.\Set-OutlookSignatures.ps1 -graphonly $graphOnly -SignatureTemplatePath $templateTargetPath\Signatures -SignatureIniPath $templateTargetPath\Signatures\_Signatures.ini -SetCurrentUserOOFMessage $SetOofMsg -CreateRtfSignatures $CreateRtfSignatures -CreateTxtSignatures $CreateTxtSignatures -DisableRoamingSignatures $DisableRoamingSignatures -MirrorLocalSignaturesToCloud $MirrorLocalSignaturesToCloud
 Stop-Transcript 
+exit 0
