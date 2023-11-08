@@ -23,6 +23,9 @@
     Contact:        support@alltimetech.co.uk
 
 #>
+environment]:localappdata)
+Start-Transcript $temp\Set-OutlookSignatures.log -Append
+
 # Variables for Download and Extract
 $githubProductOrg = "Set-OutlookSignatures"
 $githubProductRepo = "Set-OutlookSignatures"
@@ -102,7 +105,6 @@ $executionPath = "$githubProductOrg-$githubProductRepo-$($($productMeta.commit.s
 
 
 #Run product, with transcript logging, and args passed from variables above
-Start-Transcript $temp\Set-OutlookSignatures.log -Append
 cd .\$executionPath
 .\Set-OutlookSignatures.ps1 -graphonly $graphOnly -SignatureTemplatePath $templateTargetPath\Signatures -SignatureIniPath $templateTargetPath\Signatures\_Signatures.ini -SetCurrentUserOOFMessage $SetOofMsg -CreateRtfSignatures $CreateRtfSignatures -CreateTxtSignatures $CreateTxtSignatures -SignaturesForAutomappedAndAdditionalMailboxes $SignaturesForAutomappedAndAdditionalMailboxes -DisableRoamingSignatures $DisableRoamingSignatures -SetCurrentUserOutlookWebSignature $SetCurrentUserOutlookWebSignature -DeleteUserCreatedSignatures $DeleteUserCreatedSignatures -DeleteScriptCreatedSignaturesWithoutTemplate $DeleteScriptCreatedSignaturesWithoutTemplate
 
