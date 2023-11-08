@@ -29,18 +29,19 @@ $githubProductRepo = "Set-OutlookSignatures"
 $githubTemplateOrg = "alltimeuk"
 $githubTemplateRepo = "EmailTemplates"
 
-# Variables for customers to configure the product with
+# Product Variables (standard)
 $graphOnly = "true"
 $SetOofMsg = "false"
 $CreateRtfSignatures = "true"
 $CreateTxtSignatures = "true"
 $MirrorLocalSignaturesToCloud = "true"
-$SetCurrentUserOutlookWebSignature = "true" #EXOL Only?
+$SetCurrentUserOutlookWebSignature = "true"
 $SignaturesForAutomappedAndAdditionalMailboxes = "true"
 $DeleteUserCreatedSignatures = "false"
 $DeleteScriptCreatedSignaturesWithoutTemplate = "true"
 
--SetCurrentUserOutlookWebSignature $SetCurrentUserOutlookWebSignature -DeleteUserCreatedSignatures $DeleteUserCreatedSignatures -DeleteScriptCreatedSignaturesWithoutTemplate $DeleteScriptCreatedSignaturesWithoutTemplate
+# Product Variables (premium, req benefactor circle)
+
 # Init
 #New-Item -Name "temp" -path $env:localappdata -ItemType Directory -ErrorAction SilentlyContinue
 $temp = gl
@@ -103,6 +104,7 @@ $executionPath = "$githubProductOrg-$githubProductRepo-$($($productMeta.commit.s
 #Run product, with transcript logging, and args passed from variables above
 Start-Transcript $temp\Set-OutlookSignatures.log -Append
 cd .\$executionPath
-.\Set-OutlookSignatures.ps1 -graphonly $graphOnly -SignatureTemplatePath $templateTargetPath\Signatures -SignatureIniPath $templateTargetPath\Signatures\_Signatures.ini -SetCurrentUserOOFMessage $SetOofMsg -CreateRtfSignatures $CreateRtfSignatures -CreateTxtSignatures $CreateTxtSignatures -DisableRoamingSignatures $DisableRoamingSignatures -SignaturesForAutomappedAndAdditionalMailboxes $SignaturesForAutomappedAndAdditionalMailboxes
+.\Set-OutlookSignatures.ps1 -graphonly $graphOnly -SignatureTemplatePath $templateTargetPath\Signatures -SignatureIniPath $templateTargetPath\Signatures\_Signatures.ini -SetCurrentUserOOFMessage $SetOofMsg -CreateRtfSignatures $CreateRtfSignatures -CreateTxtSignatures $CreateTxtSignatures -SignaturesForAutomappedAndAdditionalMailboxes $SignaturesForAutomappedAndAdditionalMailboxes -DisableRoamingSignatures $DisableRoamingSignatures -SetCurrentUserOutlookWebSignature $SetCurrentUserOutlookWebSignature -DeleteUserCreatedSignatures $DeleteUserCreatedSignatures -DeleteScriptCreatedSignaturesWithoutTemplate $DeleteScriptCreatedSignaturesWithoutTemplate
+
 Stop-Transcript 
 exit 0
