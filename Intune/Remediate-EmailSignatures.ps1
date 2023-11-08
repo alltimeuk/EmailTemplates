@@ -15,12 +15,12 @@
     https://learn.microsoft.com/en-us/mem/intune/fundamentals/remediations
 
 .NOTES
-    Version:        1.0
+    Version:        1.0.2
     Creation Date:  2023-11-07
-    Last Updated:   2023-11-07
-    Author:         Simon Jackson @ Alltime Technologies Ltd
+    Last Updated:   2023-11-08
+    Author:         Simon Jackson / sjackson0109
     Organization:   Alltime Technologies Ltd
-    Contact:        sjackson0109 @ jacksonfamily . me
+    Contact:        support@alltimetech.co.uk
 
 #>
 # Variables for Download and Extract
