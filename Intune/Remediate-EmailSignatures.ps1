@@ -34,9 +34,13 @@ $graphOnly = "true"
 $SetOofMsg = "false"
 $CreateRtfSignatures = "true"
 $CreateTxtSignatures = "true"
-$DisableRoamingSignatures = "true"
 $MirrorLocalSignaturesToCloud = "true"
+$SetCurrentUserOutlookWebSignature = "true" #EXOL Only?
+$SignaturesForAutomappedAndAdditionalMailboxes = "true"
+$DeleteUserCreatedSignatures = "false"
+$DeleteScriptCreatedSignaturesWithoutTemplate = "true"
 
+-SetCurrentUserOutlookWebSignature $SetCurrentUserOutlookWebSignature -DeleteUserCreatedSignatures $DeleteUserCreatedSignatures -DeleteScriptCreatedSignaturesWithoutTemplate $DeleteScriptCreatedSignaturesWithoutTemplate
 # Init
 #New-Item -Name "temp" -path $env:localappdata -ItemType Directory -ErrorAction SilentlyContinue
 $temp = gl
@@ -99,6 +103,6 @@ $executionPath = "$githubProductOrg-$githubProductRepo-$($($productMeta.commit.s
 #Run product, with transcript logging, and args passed from variables above
 Start-Transcript $temp\Set-OutlookSignatures.log -Append
 cd .\$executionPath
-.\Set-OutlookSignatures.ps1 -graphonly $graphOnly -SignatureTemplatePath $templateTargetPath\Signatures -SignatureIniPath $templateTargetPath\Signatures\_Signatures.ini -SetCurrentUserOOFMessage $SetOofMsg -CreateRtfSignatures $CreateRtfSignatures -CreateTxtSignatures $CreateTxtSignatures -DisableRoamingSignatures $DisableRoamingSignatures -MirrorLocalSignaturesToCloud $MirrorLocalSignaturesToCloud
+.\Set-OutlookSignatures.ps1 -graphonly $graphOnly -SignatureTemplatePath $templateTargetPath\Signatures -SignatureIniPath $templateTargetPath\Signatures\_Signatures.ini -SetCurrentUserOOFMessage $SetOofMsg -CreateRtfSignatures $CreateRtfSignatures -CreateTxtSignatures $CreateTxtSignatures -DisableRoamingSignatures $DisableRoamingSignatures -SignaturesForAutomappedAndAdditionalMailboxes $SignaturesForAutomappedAndAdditionalMailboxes
 Stop-Transcript 
 exit 0
