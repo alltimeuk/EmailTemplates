@@ -23,7 +23,7 @@
     Contact:        support@alltimetech.co.uk
 
 #>
-environment]:localappdata)
+$temp = $(Get-Location).path
 Start-Transcript $temp\Set-OutlookSignatures.log -Append
 
 # Variables for Download and Extract
@@ -37,18 +37,15 @@ $graphOnly = "true"
 $SetOofMsg = "false"
 $CreateRtfSignatures = "true"
 $CreateTxtSignatures = "true"
-$MirrorLocalSignaturesToCloud = "true"
 $SetCurrentUserOutlookWebSignature = "true"
 $SignaturesForAutomappedAndAdditionalMailboxes = "true"
-$DeleteUserCreatedSignatures = "false"
-$DeleteScriptCreatedSignaturesWithoutTemplate = "true"
+$DeleteUserCreatedSignatures = "false"  #REQ TRUE FOR GO-LIVE
+$DeleteScriptCreatedSignaturesWithoutTemplate = "true" #REQ TRUE FOR TESTING AND GO-LIVE
 
 # Product Variables (premium, req benefactor circle)
+$MirrorLocalSignaturesToCloud = "true" #not used
 
 # Init
-#New-Item -Name "temp" -path $env:localappdata -ItemType Directory -ErrorAction SilentlyContinue
-$temp = gl
-
 # Obtain the latest release off each github project  -- note: latest is always array item 0
 $productUrl = "https://api.github.com/repos/$githubProductOrg/$githubProductRepo/tags"
 $templateUrl = "https://api.github.com/repos/$githubTemplateOrg/$githubTemplateRepo/tags"
@@ -62,6 +59,7 @@ $productPath = "$temp\$githubProductOrg-$githubProductRepo-$($($productMeta.comm
 $templatePath = "$temp\$githubTemplateOrg-$githubTemplateRepo-$($($templateMeta.commit.sha).substring(0,7))" 
 
 Add-Type -AssemblyName System.IO.Compression.FileSystem
+
 
 # Check if the latest version is already downloaded, clean up the file-system and download+extract, or just extract again
 If (Test-Path $productPath){
@@ -80,7 +78,7 @@ If (Test-Path $templatePath){
     Invoke-WebRequest "$($templateMeta.zipball_url)" -Out $templateZip
 }
 Write-host "==============="
-dir .
+Get-ChildItem $temp
 Write-host "==============="
 
 
@@ -92,7 +90,7 @@ Write-Host "Extracting $templateZip to $temp"
 [System.IO.Compression.ZipFile]::ExtractToDirectory("$templateZip", "$temp", [System.Text.Encoding]::ascii) | out-null
 
 Write-host "==============="
-dir .
+Get-ChildItem $temp
 Write-host "==============="
 
 # Gather some path data
@@ -105,8 +103,8 @@ $executionPath = "$githubProductOrg-$githubProductRepo-$($($productMeta.commit.s
 
 
 #Run product, with transcript logging, and args passed from variables above
-cd .\$executionPath
+cd $temp\$executionPath
 .\Set-OutlookSignatures.ps1 -graphonly $graphOnly -SignatureTemplatePath $templateTargetPath\Signatures -SignatureIniPath $templateTargetPath\Signatures\_Signatures.ini -SetCurrentUserOOFMessage $SetOofMsg -CreateRtfSignatures $CreateRtfSignatures -CreateTxtSignatures $CreateTxtSignatures -SignaturesForAutomappedAndAdditionalMailboxes $SignaturesForAutomappedAndAdditionalMailboxes -DisableRoamingSignatures $DisableRoamingSignatures -SetCurrentUserOutlookWebSignature $SetCurrentUserOutlookWebSignature -DeleteUserCreatedSignatures $DeleteUserCreatedSignatures -DeleteScriptCreatedSignaturesWithoutTemplate $DeleteScriptCreatedSignaturesWithoutTemplate
-
+cd $temp
 Stop-Transcript 
 exit 0

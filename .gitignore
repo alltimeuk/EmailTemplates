@@ -1,4 +1,7 @@
 #Any locally downloaded examples to be removed.
 *.zip
+*.log
+alltimeuk-EmailTemplates-*
+Set-OutlookSignatures-Set-OutlookSignatures-*
 test
 test\*
