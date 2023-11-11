@@ -37,13 +37,15 @@ $graphOnly = "true"
 $SetOofMsg = "false"
 $CreateRtfSignatures = "true"
 $CreateTxtSignatures = "true"
-$SetCurrentUserOutlookWebSignature = "true"
 $SignaturesForAutomappedAndAdditionalMailboxes = "true"
 $DeleteUserCreatedSignatures = "false"  #REQ TRUE FOR GO-LIVE
-$DeleteScriptCreatedSignaturesWithoutTemplate = "true" #REQ TRUE FOR TESTING AND GO-LIVE
 
 # Product Variables (premium, req benefactor circle)
+$DocxHighResImageConversion = "false"
+$SetCurrentUserOutlookWebSignature = "true"
 $MirrorLocalSignaturesToCloud = "true" #not used
+$DeleteScriptCreatedSignaturesWithoutTemplate = "false" #not used
+
 
 # Init
 # Obtain the latest release off each github project  -- note: latest is always array item 0
@@ -103,8 +105,8 @@ $executionPath = "$githubProductOrg-$githubProductRepo-$($($productMeta.commit.s
 
 
 #Run product, with transcript logging, and args passed from variables above
-cd $temp\$executionPath
+Set-Location $temp\$executionPath
 .\Set-OutlookSignatures.ps1 -graphonly $graphOnly -SignatureTemplatePath $templateTargetPath\Signatures -SignatureIniPath $templateTargetPath\Signatures\_Signatures.ini -SetCurrentUserOOFMessage $SetOofMsg -CreateRtfSignatures $CreateRtfSignatures -CreateTxtSignatures $CreateTxtSignatures -SignaturesForAutomappedAndAdditionalMailboxes $SignaturesForAutomappedAndAdditionalMailboxes -DisableRoamingSignatures $DisableRoamingSignatures -SetCurrentUserOutlookWebSignature $SetCurrentUserOutlookWebSignature -DeleteUserCreatedSignatures $DeleteUserCreatedSignatures -DeleteScriptCreatedSignaturesWithoutTemplate $DeleteScriptCreatedSignaturesWithoutTemplate
-cd $temp
+Set-Location $temp
 Stop-Transcript 
 exit 0
