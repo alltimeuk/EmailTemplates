@@ -49,10 +49,10 @@ $DeleteScriptCreatedSignaturesWithoutTemplate = "false" #not used
 
 # Init
 # Obtain the latest release off each github project  -- note: latest is always array item 0
-$productUrl = "https://api.github.com/repos/$githubProductOrg/$githubProductRepo/tags"
-$templateUrl = "https://api.github.com/repos/$githubTemplateOrg/$githubTemplateRepo/tags"
-$productMeta = (Invoke-WebRequest $productUrl | ConvertFrom-Json)[0]
-$templateMeta = (Invoke-WebRequest $templateUrl | ConvertFrom-Json)[0]
+$productUrl = ((Invoke-WebRequest -Uri "https://api.github.com/repos/$githubProductOrg/$githubProductRepo/releases/latest" -UseBasicParsing | ConvertFrom-Json).assets | Where-Object { $_.name -ilike 'Set-OutlookSignatures_v*.zip' })[0]
+$templateUrl = ((Invoke-WebRequest -Uri "https://api.github.com/repos/$githubTemplateOrg/$githubTemplateRepo/releases/latest" -UseBasicParsing | ConvertFrom-Json).assets | Where-Object { $_.name -ilike 'Set-OutlookSignatures_v*.zip' })
+$productMeta = Invoke-WebRequest $productUrl.browser_download_url
+$templateMeta = Invoke-WebRequest $templateUrl.browser_download_url
 
 # Specify the file-system of the downloaded targets
 $productZip = "$temp\Set-OutlookSignatures.zip"
@@ -96,7 +96,6 @@ Get-ChildItem $temp
 Write-host "==============="
 
 # Gather some path data
-$productTargetPath = "$temp\$githubProductOrg-$githubProductRepo-$($($productMeta.commit.sha).substring(0,7))\src_Set-OutlookSignatures"
 $templateTargetPath = "$temp\$githubTemplateOrg-$githubTemplateRepo-$($($templateMeta.commit.sha).substring(0,7))"
 $executionPath = "$githubProductOrg-$githubProductRepo-$($($productMeta.commit.sha).substring(0,7))\src_Set-OutlookSignatures"
 # Clean up the downloaded content
