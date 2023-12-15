@@ -3,5 +3,6 @@
 *.log
 *-EmailTemplates-*
 Set-OutlookSignatures-Set-OutlookSignatures-*
-test
-test\*
+TESTING
+TESTING\*
+TESTING\*\*
